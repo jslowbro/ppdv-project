@@ -1,8 +1,9 @@
 import json
+
+import models_marshaller
 from tinydb import TinyDB, Query
 
-from models import Reading
-from models_marshaller import unmarshal_reading
+from models import TraceModel
 
 # This file handles connecting to the database (writing and reading to file historic-readings.json)
 # It breaks all the time so we'll be probably using a different database in the future
@@ -10,16 +11,11 @@ from models_marshaller import unmarshal_reading
 db = TinyDB('db/historic-readings.json', ensure_ascii=False)
 
 
-def insert_reading(reading: Reading):
-    reading_dict = json.loads(reading.toJSON())
-    return get_table(reading.firstname, reading.lastname).insert(reading_dict)
+def save_trace(trace: TraceModel):
+    return db.table(str(trace.patient_id)).insert(trace.__dict__)
 
 
-def get_readings(first_name: str, last_name: str):
-    reading = Query()
-    ret = get_table(first_name, last_name).search((reading.firstname == first_name) & (reading.lastname == last_name))
-    return [unmarshal_reading(d) for d in ret]
-
-
-def get_table(first_name: str, last_name: str):
-    return db.table(first_name + last_name)
+def get_traces(patient_id: int ) -> [TraceModel]:
+    q = Query()
+    ret = db.table(str(patient_id)).search((q.patient_id == patient_id))
+    return [models_marshaller.trace_model_from_dict(d) for d in ret]

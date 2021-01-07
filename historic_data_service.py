@@ -1,23 +1,33 @@
 import dao
-from models import Reading
+import tesla_service
+from models import Reading, TraceModel
+import threading
+import time
+import tesla_client
 
-#This service is made primarily for accessing historical data to show to the viewer
+
+# This service is made primarily for accessing historical data to show to the viewer
 
 #
 # should register and store in some storage (file on a disk, sqlite database - your
 # choice) the history of walking for at least 10 minutes backward to current
 # time to allow review of historical values;
 
-def get_readings(first_name: str, last_name: str):
-    return dao.get_readings(first_name, last_name)
+# RUN ONLY ONCE ON STARTUP
+def start_collecting_historic_data():
+    t1 = threading.Thread(target=import_data_from_tesla)
+    t1.start()
 
 
-def get_sorted_readings(first_name: str, last_name: str):
-    return sorted(get_readings(first_name, last_name), key=lambda x: x.trace.id, reverse=True)
+def import_data_from_tesla():
+    while True:
+        time.sleep(1)
+        for i in range(1, 7):
+            fetch_and_save_trace(i)
 
 
-def get_sensor(first_name: str, last_name: str, sensor: str):
-    return get_sensor(get_readings(first_name, last_name), sensor)
+def get_traces(patient_id: int) -> [TraceModel]:
+    return dao.get_traces(patient_id)
 
 
 def get_sensor(reading_list, sensor: str):
@@ -28,3 +38,8 @@ def get_sensor(reading_list, sensor: str):
 def get_sensor_from_reading(reading: Reading, sensor_name: str):
     iter = filter(lambda s: s.name == sensor_name, reading.trace.sensors)
     return list(iter)[0]
+
+
+def fetch_and_save_trace(patient_id: int):
+    trace = tesla_client.get_patient_trace(patient_id)
+    dao.save_trace(trace)

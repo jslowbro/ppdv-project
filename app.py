@@ -16,7 +16,7 @@ from dash.dependencies import Input, Output
 
 import models_marshaller
 import tesla_service
-from historic_data_service import get_readings, get_sensor
+from historic_data_service import get_traces, start_collecting_historic_data, fetch_and_save_trace
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -25,12 +25,27 @@ client_id = 1
 reload_time = 500
 max_length = 1000
 
+# ON Start
+start_collecting_historic_data()
+
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.layout = html.Div(children=[
     # Hidden div inside the app that stores the intermediate value
     html.Div(id='trace-state', style={'display': 'none'}),
     html.Div(id='person-state', style={'display': 'none'}),
     ######
+    # INTERVALS
+    dcc.Interval(
+        id='interval-component',
+        interval=1 * reload_time,
+        n_intervals=0
+    ),
+    dcc.Interval(
+        id='historic-data-interval',
+        interval=1 * 2000,
+        n_intervals=0
+    ),
+    ###########
     html.H1(children='Welcome to walking simulation',
             style={
                 'textAlign': 'center',
@@ -48,11 +63,6 @@ app.layout = html.Div(children=[
             {'label': 'Bartosz Moskalski', 'value': 6}
         ],
         value=client_id
-    ),
-    dcc.Interval(
-        id='interval-component',
-        interval=1 * reload_time,
-        n_intervals=0
     ),
     dcc.Graph(
         id='example-graph',
@@ -80,12 +90,12 @@ app.layout = html.Div(children=[
     dcc.Checklist(
         id='sensor-checklist',
         options=[
-            {'label': 'L0', 'value': 'L0'},
-            {'label': 'L1', 'value': 'L1'},
-            {'label': 'L2', 'value': 'L2'},
-            {'label': 'R0', 'value': 'R0'},
-            {'label': 'R1', 'value': 'R1'},
-            {'label': 'R2', 'value': 'R2'}
+            {'label': 'L0', 'value': 'l0'},
+            {'label': 'L1', 'value': 'l1'},
+            {'label': 'L2', 'value': 'l2'},
+            {'label': 'R0', 'value': 'r0'},
+            {'label': 'R1', 'value': 'r1'},
+            {'label': 'R2', 'value': 'r2'}
         ],
         value=['L0', 'L1', 'L2'],
         labelStyle={'display': 'inline-block'}
@@ -130,7 +140,7 @@ def update_graph_live(reading_json):
     [Input('interval-component', 'n_intervals'), Input('person-dropdown', 'value')]
 )
 def save_reading_to_state(n_intervals, person_id):
-    reading = tesla_service.get_and_save_patient_reading(person_id)
+    reading = tesla_service.get_patient_reading(person_id)
     reading_json = reading.toJSON()
     return reading_json
 
@@ -162,23 +172,23 @@ def get_person_from_state(reading_json):
 
 @app.callback(
     Output('historic-data-graph', 'figure'),
-    [Input('person-state', 'children'), Input('sensor-checklist', 'value'), Input('refresh-historic-data', 'n_clicks')]
+    [Input('person-dropdown', 'value'),
+     Input('sensor-checklist', 'value'),
+     Input('historic-data-interval', 'n_intervals')]
 )
-def display_historic_readings_graph(reading_json, sensor_options, n_clicks):
-    reading = models_marshaller.reading_from_json(reading_json)
-    reading_list = get_readings(reading.firstname, reading.lastname)[0:max_length]
-    print(sensor_options)
+def display_historic_readings_graph(patient_id, sensor_options, n_intervals):
+    traces = map(lambda t: t.__dict__, get_traces(patient_id))
+    print(len(traces))
     return {
         'data': [
             dict(
-                x=[i for i in range(0, len(reading_list) - 1)],
-                y=[sensor.value for sensor in get_sensor(reading_list, s)],
+                x=[i for i in range(0, len(traces) - 1)],
+                y=[i[s] for i in traces],
                 name=s
             ) for s in sensor_options
         ],
         'layout': {
             'title': 'View of sensor specific trace',
-            'transition': {'duration': reload_time / 5},
             'font': {
                 'size': 8
             }
