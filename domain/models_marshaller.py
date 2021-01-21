@@ -1,6 +1,5 @@
 import json
-
-from models import Reading, Trace, Sensor, TraceModel, AnomalyTrace
+from domain.models import Reading, Trace, Sensor, TraceModel, AnomalyTrace
 
 
 # This file handles creating objects (Reading, Trace, Sensor) from Python data structures (dictionaries) and json

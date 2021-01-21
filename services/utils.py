@@ -1,4 +1,4 @@
-from models import TraceModel
+from domain.models import TraceModel
 
 max_marks = 10
 

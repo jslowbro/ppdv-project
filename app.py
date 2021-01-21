@@ -16,11 +16,8 @@ from dash.dependencies import Input, Output
 # It asks tesla_service.py and historic_data_service.py to fetch data and then displays that data in dash components
 # It also handles user interactions like user checking a box or choosing an option from a dropdown menu
 
-import models_marshaller
-import tesla_service
-import historic_data_service
-import historic_data_collector
-import utils
+from domain import models_marshaller
+from services import historic_data_collector, historic_data_service, tesla_service, utils
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 

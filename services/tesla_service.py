@@ -1,4 +1,4 @@
-import tesla_client
+from client import tesla_client
 
 
 # This one handles using the tesla client

@@ -2,11 +2,10 @@ import datetime
 import threading
 import time
 
-import anomaly_dao
-import dao
-import tesla_client
-import utils
-from models import AnomalyTrace
+from dao import anomaly_dao, trace_dao
+from client import tesla_client
+from services import utils
+from domain.models import AnomalyTrace
 
 anomaly_alarm_cache = dict()
 
@@ -48,4 +47,4 @@ def fetch_and_save_trace(patient_id: int):
                                                            [trace.__dict__])
         else:
             # no anomaly detected save normal trace
-            dao.save_trace(trace)
+            trace_dao.save_trace(trace)

@@ -1,7 +1,7 @@
 import requests
 
-import models_marshaller
-from models import Reading, TraceModel
+from domain.models import Reading, TraceModel
+from domain import models_marshaller
 
 # This file is used for accessing the API that we're meant to work with
 url = "http://tesla.iem.pw.edu.pl:9080/v2/monitor/"

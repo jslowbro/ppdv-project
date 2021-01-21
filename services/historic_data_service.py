@@ -1,6 +1,6 @@
-import anomaly_dao
-import dao
-from models import TraceModel, AnomalyTrace
+from dao import anomaly_dao, trace_dao
+from domain.models import TraceModel, AnomalyTrace
+
 
 # This service is made primarily for accessing historical data to show to the viewer
 
@@ -12,7 +12,7 @@ from models import TraceModel, AnomalyTrace
 # RUN ONLY ONCE ON STARTUP
 
 def get_traces(patient_id: int) -> [TraceModel]:
-    return dao.get_traces(patient_id)
+    return trace_dao.get_traces(patient_id)
 
 
 def get_anomalies_for_patient(patient_id: int) -> [AnomalyTrace]:

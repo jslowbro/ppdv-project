@@ -1,7 +1,7 @@
 from tinydb import TinyDB, Query
 
-import models_marshaller
-from models import TraceModel
+from domain.models import TraceModel
+from domain import models_marshaller
 
 # This file handles connecting to the database (writing and reading to file historic-readings.json)
 # It breaks all the time so we'll be probably using a different database in the future
