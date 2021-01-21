@@ -15,7 +15,7 @@ def save_trace(trace: TraceModel):
     return db.table(str(trace.patient_id)).insert(trace.__dict__)
 
 
-def get_traces(patient_id: int ) -> [TraceModel]:
+def get_traces(patient_id: int) -> [TraceModel]:
     q = Query()
     ret = db.table(str(patient_id)).search((q.patient_id == patient_id))
     return [models_marshaller.trace_model_from_dict(d) for d in ret]

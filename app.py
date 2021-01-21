@@ -26,6 +26,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 client_id = 1
 reload_time = 500
 max_length = 1000
+max_marks = 10
 color_map = {
     'l0': '#2c8129',
     'l1': '#cbe927',
@@ -81,10 +82,6 @@ app.layout = html.Div(children=[
         ],
         value=client_id
     ),
-    dcc.Graph(
-        id='example-graph',
-        animate=True
-    ),
     html.Table(
         style={
             'width': "100%"
@@ -102,6 +99,10 @@ app.layout = html.Div(children=[
             ])
 
         ]
+    ),
+    dcc.Graph(
+        id='example-graph',
+        animate=True
     ),
     html.H3(children='Choose sensors to view historic values'),
     dcc.Checklist(
@@ -123,12 +124,13 @@ app.layout = html.Div(children=[
         n_clicks=0
     ),
     dcc.Graph(id='historic-data-graph'),
+    html.Label(id='range-slider-label'),
     dcc.RangeSlider(
         id='historic-data-slider',
         min=0,
         max=3600,
         step=1,
-        value=[0, 3600],
+        value=[0, 0],
         allowCross=False
     ),
 
@@ -184,12 +186,14 @@ def save_historic_trace_to_state(n_clicks, patient_id):
 
 
 @app.callback(
-    Output('historic-data-slider', 'max'),
+    [Output('historic-data-slider', 'max'), Output('historic-data-slider', 'marks')],
     Input('historic-readings-state', 'children')
 )
-def update_max_range(historic_readings_state):
-    max_range = len(list(json.loads(historic_readings_state)))
-    return max_range
+def update_slider(historic_readings_state):
+    historic_readings = list(json.loads(historic_readings_state))
+    max_range = len(historic_readings)
+    marks = generate_marks(max_range)
+    return max_range, marks
 
 
 @app.callback(
@@ -225,7 +229,6 @@ def get_person_from_state(reading_json):
 )
 def display_historic_readings_graph(sensor_options, slider_range, historic_readings_state):
     traces = list(json.loads(historic_readings_state))[slider_range[0]:slider_range[1]]
-    print(len(traces))
     return {
         'data': [
             dict(
@@ -247,6 +250,26 @@ def display_historic_readings_graph(sensor_options, slider_range, historic_readi
             }
         },
     }
+
+
+@app.callback(
+    Output('range-slider-label', 'children'),
+    Input('historic-data-slider', 'value')
+)
+def display_range_slider_value(slider_range):
+    return 'You are viewing an interval : {} - {}'.format(slider_range[0], slider_range[1])
+
+
+def generate_marks(max_range):
+    marks = {}
+    n_marks = max_marks
+    if max_range < max_marks:
+        n_marks = max_range
+    step = round(max_range / n_marks)
+    for i in range(0, n_marks):
+        marks[i * step] = str(i * step)
+    marks[max_range] = str(max_range)
+    return marks
 
 
 if __name__ == '__main__':

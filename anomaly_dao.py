@@ -1,5 +1,3 @@
-import json
-
 import models_marshaller
 from tinydb import TinyDB, Query
 
