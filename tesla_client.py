@@ -1,7 +1,8 @@
 import requests
 
-from models import Reading, TraceModel
 import models_marshaller
+from models import Reading, TraceModel
+
 # This file is used for accessing the API that we're meant to work with
 url = "http://tesla.iem.pw.edu.pl:9080/v2/monitor/"
 

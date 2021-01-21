@@ -19,6 +19,8 @@ from dash.dependencies import Input, Output
 import models_marshaller
 import tesla_service
 import historic_data_service
+import historic_data_collector
+import utils
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -26,7 +28,7 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 client_id = 1
 reload_time = 500
 max_length = 1000
-max_marks = 10
+
 color_map = {
     'l0': '#2c8129',
     'l1': '#cbe927',
@@ -43,7 +45,7 @@ color_map = {
 }
 
 # ON Start
-historic_data_service.start_collecting_historic_data()
+historic_data_collector.start_collecting_historic_data()
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -139,7 +141,7 @@ app.layout = html.Div(children=[
             id='refresh-historic-data',
             n_clicks=0
         ),
-    ], style={'columnCount': 2, 'textAlign': 'center', 'margin': '10px'}),
+    ], style={'textAlign': 'center'}),
     html.Div(
         [
             html.H6(id='range-slider-label'),
@@ -150,7 +152,7 @@ app.layout = html.Div(children=[
         min=0,
         max=3600,
         step=1,
-        value=[0, 5],
+        value=[0, 10],
         allowCross=False
     ),
     html.H2(children='Anomaly Screener',
@@ -189,6 +191,8 @@ app.layout = html.Div(children=[
     [Input('anomaly-dropdown', 'value'), Input('anomaly-sensor-checklist', 'value')]
 )
 def update_anomaly_graph(anomaly_trace_json, sensor_options):
+    if anomaly_trace_json is None:
+        return {}
     anomaly_trace = json.loads(anomaly_trace_json)
     traces = anomaly_trace['traces']
     return {
@@ -206,7 +210,9 @@ def update_anomaly_graph(anomaly_trace_json, sensor_options):
             ) for s in sensor_options
         ],
         'layout': {
-            'title': 'View of sensor specific trace',
+            'title': 'Trace in which an anomaly has been detected',
+            'xaxis': {'title': 'Timeline of data points'},
+            'yaxis': {'title': 'Pressure on sensor'},
             'font': {
                 'size': 8
             }
@@ -280,7 +286,7 @@ def save_historic_trace_to_state(n_clicks, patient_id):
 def update_slider(historic_readings_state):
     historic_readings = list(json.loads(historic_readings_state))
     max_range = len(historic_readings)
-    marks = generate_marks(max_range)
+    marks = utils.generate_marks(max_range)
     return max_range, marks
 
 
@@ -327,11 +333,13 @@ def display_historic_readings_graph(sensor_options, slider_range, historic_readi
                 marker={
                     'color': color_map[s]
                 },
-                showlegend=False
+                showlegend=False,
             ) for s in sensor_options
         ],
         'layout': {
-            'title': 'View an anomaly happening',
+            'title': 'View historic traces, maximum of 10 minutes backwards',
+            'xaxis': {'title': 'Timeline of data points'},
+            'yaxis': {'title': 'Pressure on sensor'},
             'font': {
                 'size': 8
             }
@@ -345,18 +353,6 @@ def display_historic_readings_graph(sensor_options, slider_range, historic_readi
 )
 def display_range_slider_value(slider_range):
     return 'You are viewing an interval : {} - {}'.format(slider_range[0], slider_range[1])
-
-
-def generate_marks(max_range):
-    marks = {}
-    n_marks = max_marks
-    if max_range < max_marks:
-        n_marks = max_range
-    step = round(max_range / n_marks)
-    for i in range(0, n_marks):
-        marks[i * step] = str(i * step)
-    marks[max_range] = str(max_range)
-    return marks
 
 
 if __name__ == '__main__':

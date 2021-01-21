@@ -3,7 +3,8 @@ import json
 from models import Reading, Trace, Sensor, TraceModel, AnomalyTrace
 
 
-# This file handles creating objects (Reading, Trace, Sensor) from Python data structures (dictionaries) and json represenations
+# This file handles creating objects (Reading, Trace, Sensor) from Python data structures (dictionaries) and json
+# represenations
 
 def unmarshal_reading(reading_dict):
     r = Reading(

@@ -1,7 +1,7 @@
-import models_marshaller
 from tinydb import TinyDB, Query
 
-from models import TraceModel, AnomalyTrace
+import models_marshaller
+from models import AnomalyTrace
 
 # This file handles connecting to the database (writing and reading to file historic-readings.json)
 # It breaks all the time so we'll be probably using a different database in the future
