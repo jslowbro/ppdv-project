@@ -1,0 +1,59 @@
+{
+  "4": {
+    "1": {
+      "patient_id": 4,
+      "anomaly_start": "2021-01-21 16:06:39.036088",
+      "anomaly_end": "2021-01-21 16:06:45.017436",
+      "traces": [
+        {
+          "trace_id": 17045124082019,
+          "patient_id": 4,
+          "l0": 259,
+          "l0a": true,
+          "l1": 233,
+          "l1a": true,
+          "l2": 625,
+          "l2a": true,
+          "r0": 1023,
+          "r0a": true,
+          "r1": 590,
+          "r1a": true,
+          "r2": 1023,
+          "r2a": true
+        },
+        {
+          "trace_id": 17045324082019,
+          "patient_id": 4,
+          "l0": 396,
+          "l0a": true,
+          "l1": 404,
+          "l1a": true,
+          "l2": 612,
+          "l2a": true,
+          "r0": 1023,
+          "r0a": true,
+          "r1": 1023,
+          "r1a": true,
+          "r2": 1023,
+          "r2a": true
+        },
+        {
+          "trace_id": 17045624082019,
+          "patient_id": 4,
+          "l0": 1023,
+          "l0a": true,
+          "l1": 1023,
+          "l1a": true,
+          "l2": 1023,
+          "l2a": true,
+          "r0": 1023,
+          "r0a": true,
+          "r1": 331,
+          "r1a": true,
+          "r2": 372,
+          "r2a": true
+        }
+      ]
+    }
+  }
+}

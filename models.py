@@ -2,6 +2,7 @@ import json
 from dataclasses import dataclass
 from typing import List
 
+
 # This file defines structure of the sensor data
 # Response from http://tesla.iem.pw.edu.pl:9080/v2/monitor/1 is a blueprint for how the data looks
 @dataclass
@@ -57,6 +58,18 @@ class TraceModel:
     r1a: bool
     r2: int
     r2a: bool
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__,
+                          sort_keys=True, indent=4)
+
+
+@dataclass
+class AnomalyTrace:
+    patient_id: int
+    anomaly_start: str
+    anomaly_end: str
+    traces: List[dict]
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,

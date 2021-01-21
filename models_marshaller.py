@@ -1,6 +1,6 @@
 import json
 
-from models import Reading, Trace, Sensor, TraceModel
+from models import Reading, Trace, Sensor, TraceModel, AnomalyTrace
 
 
 # This file handles creating objects (Reading, Trace, Sensor) from Python data structures (dictionaries) and json represenations
@@ -85,3 +85,13 @@ def trace_model_from_dict(trace_dict):
         r2a=trace_dict['r2a']
     )
     return tm
+
+
+def anomaly_trace_from_dict(anomaly_trace):
+    at = AnomalyTrace(
+        patient_id=anomaly_trace['patient_id'],
+        anomaly_start=anomaly_trace['anomaly_start'],
+        anomaly_end=anomaly_trace['anomaly_end'],
+        traces=[t for t in anomaly_trace['traces']]
+    )
+    return at
