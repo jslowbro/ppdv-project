@@ -16,7 +16,7 @@ from dash.dependencies import Input, Output
 
 import models_marshaller
 import tesla_service
-from historic_data_service import get_traces, start_collecting_historic_data, fetch_and_save_trace
+import historic_data_service
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -24,9 +24,23 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 client_id = 1
 reload_time = 500
 max_length = 1000
+color_map = {
+    'l0': '#2c8129',
+    'l1': '#cbe927',
+    'l2': '#6eddaa',
+    'r0': '#fe9882',
+    'r1': '#ff6201',
+    'r2': '#cd2701',
+    'L0': '#2c8129',
+    'L1': '#cbe927',
+    'L2': '#6eddaa',
+    'R0': '#fe9882',
+    'R1': '#ff6201',
+    'R2': '#cd2701'
+}
 
 # ON Start
-start_collecting_historic_data()
+historic_data_service.start_collecting_historic_data()
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.layout = html.Div(children=[
@@ -51,7 +65,7 @@ app.layout = html.Div(children=[
                 'textAlign': 'center',
                 'color': 'blue'
             }),
-    html.Label('Dropdown'),
+    html.Label('Choose a person'),
     dcc.Dropdown(
         id='person-dropdown',
         options=[
@@ -97,7 +111,7 @@ app.layout = html.Div(children=[
             {'label': 'R1', 'value': 'r1'},
             {'label': 'R2', 'value': 'r2'}
         ],
-        value=['L0', 'L1', 'L2'],
+        value=['l0', 'l1', 'l2'],
         labelStyle={'display': 'inline-block'}
     ),
     html.Button(
@@ -105,7 +119,15 @@ app.layout = html.Div(children=[
         id='refresh-historic-data',
         n_clicks=0
     ),
-    dcc.Graph(id='historic-data-graph', animate=True)
+    dcc.Graph(id='historic-data-graph'),
+    dcc.RangeSlider(
+        id='historic-data-slider',
+        min=0,
+        max=3600,
+        step=1,
+        marks=[{i: i} for i in range(0, 3600, 50)],
+        value=[0, 3600]
+    ),
 
 ])
 
@@ -119,10 +141,13 @@ def update_graph_live(reading_json):
     return {
         'data': [
             dict(
-                x=[sensor.id],
+                x=[sensor.name],
                 y=[sensor.value],
-                name=sensor.name,
-                type='bar'
+                type='bar',
+                marker={
+                    'color': color_map[sensor.name]
+                },
+                showlegend=False
             ) for sensor in reading.trace.sensors
         ],
         'layout': {
@@ -177,14 +202,16 @@ def get_person_from_state(reading_json):
      Input('historic-data-interval', 'n_intervals')]
 )
 def display_historic_readings_graph(patient_id, sensor_options, n_intervals):
-    traces = map(lambda t: t.__dict__, get_traces(patient_id))
+    traces = list(map(lambda t: t.__dict__, historic_data_service.get_traces(patient_id)))
     print(len(traces))
     return {
         'data': [
             dict(
-                x=[i for i in range(0, len(traces) - 1)],
+                x=[i for i in range(0, len(traces))],
                 y=[i[s] for i in traces],
-                name=s
+                name=s,
+                mode='lines+markers',
+                type='scatter'
             ) for s in sensor_options
         ],
         'layout': {
