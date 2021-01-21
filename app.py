@@ -156,7 +156,17 @@ app.layout = html.Div(children=[
             style={
                 'textAlign': 'center'
             }),
-    dcc.Graph(id='anomaly-viewer'),
+    dcc.Graph(id='anomaly-viewer', figure={
+        'data': {},
+        'layout': {
+            'title': 'Trace in which an anomaly has been detected',
+            'xaxis': {'title': 'Timeline of data points'},
+            'yaxis': {'title': 'Pressure on sensor'},
+            'font': {
+                'size': 8
+            }
+        },
+    }),
     html.Div([
         html.Div([
             dcc.Checklist(
@@ -248,6 +258,8 @@ def update_graph_live(reading_json):
         ],
         'layout': {
             'title': 'Simulation of a walking process',
+            'xaxis': {'title': 'Sensors'},
+            'yaxis': {'title': 'Pressure on sensor'},
             'transition': {'duration': reload_time / 5},
             'font': {
                 'size': 8
@@ -353,4 +365,4 @@ def display_range_slider_value(slider_range):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
