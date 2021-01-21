@@ -65,41 +65,57 @@ app.layout = html.Div(children=[
         n_intervals=0
     ),
     ###########
+    html.H1(children='Welcome to Walking Visualiser',
+            style={
+                'textAlign': 'center'
+            }),
+    html.Div([
+        html.Div(children=[
+            html.Label('Choose a person'),
+            dcc.Dropdown(
+                id='person-dropdown',
+                options=[
+                    {'label': 'Janek Grzegorczyk', 'value': 1},
+                    {'label': u'Elżbieta Kochalska', 'value': 2},
+                    {'label': 'Albert Lisowski', 'value': 3},
+                    {'label': 'Ewelina Nosowska', 'value': 4},
+                    {'label': 'Piotr Fokalski', 'value': 5},
+                    {'label': 'Bartosz Moskalski', 'value': 6}
+                ],
+                value=client_id
+            ),
+            html.Table(
+                style={
+                    'width': "100%"
+                },
+                children=[
+                    html.Thead(children=[
+                        html.Tr(children=[
+                            html.Th(children='First name'),
+                            html.Th(children='Last name'),
+                            html.Th(children='Birth Date'),
+                            html.Th(children='Is the person disabled ?')
+                        ]),
+                        html.Tr(id='person-data')
+                    ])
+
+                ]
+            ),
+
+        ]),
+        html.Figure(children=[
+            html.Img(src='/assets/feet.png',
+                     style={'textAlign': 'center'}
+                     ),
+            html.Figcaption('Sensors placement on feet'),
+        ],
+            style={'textAlign': 'center'}
+        ),
+    ], style={'columnCount': 2}),
     html.H2(children='Live Walking View',
             style={
                 'textAlign': 'center'
             }),
-    html.Label('Choose a person'),
-    dcc.Dropdown(
-        id='person-dropdown',
-        options=[
-            {'label': 'Janek Grzegorczyk', 'value': 1},
-            {'label': u'Elżbieta Kochalska', 'value': 2},
-            {'label': 'Albert Lisowski', 'value': 3},
-            {'label': 'Ewelina Nosowska', 'value': 4},
-            {'label': 'Piotr Fokalski', 'value': 5},
-            {'label': 'Bartosz Moskalski', 'value': 6}
-        ],
-        value=client_id
-    ),
-    html.Table(
-        style={
-            'width': "100%"
-        },
-        children=[
-            html.Thead(children=[
-                html.Tr(children=[
-                    html.Th(children='First name'),
-                    html.Th(children='Last name'),
-                    html.Th(children='Birth Date'),
-                    html.Th(children='Is the person disabled ?'),
-                    html.Th(children='Trace comment')
-                ]),
-                html.Tr(id='person-data')
-            ])
-
-        ]
-    ),
     dcc.Graph(
         id='example-graph',
         animate=True
@@ -108,73 +124,99 @@ app.layout = html.Div(children=[
             style={
                 'textAlign': 'center'
             }),
-    dcc.Checklist(
-        id='sensor-checklist',
-        options=[
-            {'label': 'L0', 'value': 'l0'},
-            {'label': 'L1', 'value': 'l1'},
-            {'label': 'L2', 'value': 'l2'},
-            {'label': 'R0', 'value': 'r0'},
-            {'label': 'R1', 'value': 'r1'},
-            {'label': 'R2', 'value': 'r2'}
-        ],
-        value=['l0', 'l1', 'l2'],
-        labelStyle={'display': 'inline-block'}
-    ),
-    html.Button(
-        'Refresh Historic Values',
-        id='refresh-historic-data',
-        n_clicks=0
-    ),
     dcc.Graph(id='historic-data-graph'),
-    html.Label(id='range-slider-label'),
+    html.Div([
+        dcc.Checklist(
+            id='sensor-checklist',
+            options=[
+                {'label': 'L0', 'value': 'l0'},
+                {'label': 'L1', 'value': 'l1'},
+                {'label': 'L2', 'value': 'l2'},
+                {'label': 'R0', 'value': 'r0'},
+                {'label': 'R1', 'value': 'r1'},
+                {'label': 'R2', 'value': 'r2'}
+            ],
+            value=['l0', 'l1', 'l2'],
+            labelStyle={'display': 'inline-block'}
+        ),
+        html.Button(
+            'Refresh Historic Values',
+            id='refresh-historic-data',
+            n_clicks=0
+        ),
+    ], style={'columnCount': 2, 'textAlign': 'center', 'margin': '10px'}),
+    html.Div(
+        [
+            html.H6(id='range-slider-label'),
+        ], style={'textAlign': 'center'}
+    ),
     dcc.RangeSlider(
         id='historic-data-slider',
         min=0,
         max=3600,
         step=1,
-        value=[0, 0],
+        value=[0, 5],
         allowCross=False
     ),
-    html.H2(children='Anomaly Detector',
+    html.H2(children='Anomaly Screener',
             style={
                 'textAlign': 'center'
             }),
-    dcc.Dropdown(
-        id='anomaly-dropdown',
-        options=[]
-    ),
-    dcc.Graph(id='anomaly-viewer')
+    dcc.Graph(id='anomaly-viewer'),
+    html.Div([
+        html.Div([
+            dcc.Checklist(
+                id='anomaly-sensor-checklist',
+                options=[
+                    {'label': 'L0', 'value': 'l0'},
+                    {'label': 'L1', 'value': 'l1'},
+                    {'label': 'L2', 'value': 'l2'},
+                    {'label': 'R0', 'value': 'r0'},
+                    {'label': 'R1', 'value': 'r1'},
+                    {'label': 'R2', 'value': 'r2'}
+                ],
+                value=['l0', 'l1', 'l2'],
+                labelStyle={'display': 'inline-block'}
+            ),
+        ]),
+        html.Div([
+            dcc.Dropdown(
+                id='anomaly-dropdown',
+                options=[]
+            ),
+        ]),
+    ], style={'textAlign': 'center', 'margin': '10px'}),
 ])
-#
-# @app.callback(
-#     Output('anomaly-viewer', 'figure'),
-#     Input('anomaly-dropdown', 'value')
-# )
-# def update_anomaly_graph(anomaly_trace_json):
-#     anomaly_trace = json.loads(anomaly_trace_json)
-#     traces = anomaly_trace['traces']
-#     return {
-#         'data': [
-#             dict(
-#                 x=[i for i in range(0, len(traces])),
-#                 y=[i[s ] for i in traces],
-#                 name=s,
-#                 mode='lines+markers',
-#                 type='scatter',
-#                 marker={
-#                     'color': color_map[s]
-#                 },
-#                 showlegend=False
-#             ) for t in anomaly_trace['traces']
-#         ],
-#         'layout': {
-#             'title': 'View of sensor specific trace',
-#             'font': {
-#                 'size': 8
-#             }
-#         },
 
+
+@app.callback(
+    Output('anomaly-viewer', 'figure'),
+    [Input('anomaly-dropdown', 'value'), Input('anomaly-sensor-checklist', 'value')]
+)
+def update_anomaly_graph(anomaly_trace_json, sensor_options):
+    anomaly_trace = json.loads(anomaly_trace_json)
+    traces = anomaly_trace['traces']
+    return {
+        'data': [
+            dict(
+                x=[i for i in range(0, len(traces))],
+                y=[i[s] for i in traces],
+                name=s,
+                mode='lines+markers',
+                type='scatter',
+                marker={
+                    'color': color_map[s]
+                },
+                showlegend=False
+            ) for s in sensor_options
+        ],
+        'layout': {
+            'title': 'View of sensor specific trace',
+            'font': {
+                'size': 8
+            }
+        },
+    }
 
 
 @app.callback(
@@ -267,8 +309,7 @@ def get_person_from_state(reading_json):
         html.Td(children=reading.firstname),
         html.Td(children=reading.lastname),
         html.Td(children=reading.birthdate),
-        html.Td(children=str(reading.disabled)),
-        html.Td(children=reading.trace.name)
+        html.Td(children=str(reading.disabled))
     ]
 
 
