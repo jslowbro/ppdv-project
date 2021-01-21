@@ -59,11 +59,6 @@ app.layout = html.Div(children=[
         interval=1 * reload_time,
         n_intervals=0
     ),
-    dcc.Interval(
-        id='historic-data-interval',
-        interval=1 * 5000,
-        n_intervals=0
-    ),
     ###########
     html.H1(children='Welcome to Walking Visualiser',
             style={
@@ -225,8 +220,8 @@ def update_anomaly_graph(anomaly_trace_json, sensor_options):
 )
 def load_anomaly_dropdown(patient_id, n_clicks):
     anomalies = historic_data_service.get_anomalies_for_patient(patient_id)
-    options = [{'label': a.anomaly_start + ' - ' + a.anomaly_end, 'value': json.dumps(a.__dict__)} for a in anomalies]
-    print(options)
+    options = [{'label': a.anomaly_start[0:19] + ' - ' + a.anomaly_end[0:19], 'value': json.dumps(a.__dict__)} for a in
+               anomalies]
     return options
 
 
@@ -336,7 +331,7 @@ def display_historic_readings_graph(sensor_options, slider_range, historic_readi
             ) for s in sensor_options
         ],
         'layout': {
-            'title': 'View of sensor specific trace',
+            'title': 'View an anomaly happening',
             'font': {
                 'size': 8
             }
