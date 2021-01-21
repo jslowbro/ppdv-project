@@ -46,6 +46,7 @@ color_map = {
 historic_data_service.start_collecting_historic_data()
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
 app.layout = html.Div(children=[
     # Hidden div inside the app that stores the intermediate value
     html.Div(id='trace-state', style={'display': 'none'}),
@@ -133,7 +134,9 @@ app.layout = html.Div(children=[
         value=[0, 0],
         allowCross=False
     ),
-
+    dcc.Dropdown(
+        id='anomaly-dropdown'
+    )
 ])
 
 

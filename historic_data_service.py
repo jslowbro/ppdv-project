@@ -34,12 +34,20 @@ def get_traces(patient_id: int) -> [TraceModel]:
     return dao.get_traces(patient_id)
 
 
+def get_anomalies_for_patient(patient_id: int) -> [AnomalyTrace]:
+    return anomaly_dao.get_anomaly_traces(patient_id)
+
+
+def get_anomaly_for_patient(patient_id: int, anomaly_start: str, anomaly_end: str) -> AnomalyTrace:
+    return anomaly_dao.get_anomaly_trace(patient_id=patient_id, anomaly_start=anomaly_start, anomaly_end=anomaly_end)
+
+
 def fetch_and_save_trace(patient_id: int):
     trace = tesla_client.get_patient_trace(patient_id)
     # If anomaly already registered for patient
     if patient_id in anomaly_alarm_cache:
         if is_anomaly_detected(trace):
-            print('ANOMALY DETECED - SAVING TO CACHE')
+            print('ANOMALY DETECTED - SAVING TO CACHE')
             # Anomaly continuing, append it to traceList
             anomaly_alarm_cache[patient_id].traces.append(trace.__dict__)
         else:
