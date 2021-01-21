@@ -47,12 +47,12 @@ def fetch_and_save_trace(patient_id: int):
     # If anomaly already registered for patient
     if patient_id in anomaly_alarm_cache:
         if is_anomaly_detected(trace):
-            print('ANOMALY DETECTED - SAVING TO CACHE')
+            print('ANOMALY DETECTED - SAVING TO CACHE, PATIENT ID = {}'.format(patient_id))
             # Anomaly continuing, append it to traceList
             anomaly_alarm_cache[patient_id].traces.append(trace.__dict__)
         else:
             # Anomaly stopped, update end time, save trace to db, clear cache
-            print('ANOMALY STOPPED - SAVING TO DB')
+            print('ANOMALY STOPPED - SAVING TO DB, PATIENT ID = {}'.format(patient_id))
             anomaly_trace = anomaly_alarm_cache[patient_id]
             anomaly_trace.anomaly_end = str(datetime.datetime.now())
             anomaly_dao.save_anomaly_trace(anomaly_alarm_cache[patient_id])
@@ -60,7 +60,7 @@ def fetch_and_save_trace(patient_id: int):
     # Anomaly not registered for patient
     else:
         if is_anomaly_detected(trace):
-            print('ANOMALY DETECTED - CACHING AN ANOMALY')
+            print('ANOMALY DETECTED - CACHING AN ANOMALY, PATIENT ID = {}'.format(patient_id))
             # Register anomaly in cache
             anomaly_alarm_cache[patient_id] = AnomalyTrace(patient_id, str(datetime.datetime.now()), "",
                                                            [trace.__dict__])

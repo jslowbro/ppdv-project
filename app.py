@@ -61,14 +61,13 @@ app.layout = html.Div(children=[
     ),
     dcc.Interval(
         id='historic-data-interval',
-        interval=1 * 2000,
+        interval=1 * 5000,
         n_intervals=0
     ),
     ###########
-    html.H1(children='Welcome to walking simulation',
+    html.H2(children='Live Walking View',
             style={
-                'textAlign': 'center',
-                'color': 'blue'
+                'textAlign': 'center'
             }),
     html.Label('Choose a person'),
     dcc.Dropdown(
@@ -105,7 +104,10 @@ app.layout = html.Div(children=[
         id='example-graph',
         animate=True
     ),
-    html.H3(children='Choose sensors to view historic values'),
+    html.H2(children='Historic Data Viewer',
+            style={
+                'textAlign': 'center'
+            }),
     dcc.Checklist(
         id='sensor-checklist',
         options=[
@@ -134,10 +136,56 @@ app.layout = html.Div(children=[
         value=[0, 0],
         allowCross=False
     ),
+    html.H2(children='Anomaly Detector',
+            style={
+                'textAlign': 'center'
+            }),
     dcc.Dropdown(
-        id='anomaly-dropdown'
-    )
+        id='anomaly-dropdown',
+        options=[]
+    ),
+    dcc.Graph(id='anomaly-viewer')
 ])
+#
+# @app.callback(
+#     Output('anomaly-viewer', 'figure'),
+#     Input('anomaly-dropdown', 'value')
+# )
+# def update_anomaly_graph(anomaly_trace_json):
+#     anomaly_trace = json.loads(anomaly_trace_json)
+#     traces = anomaly_trace['traces']
+#     return {
+#         'data': [
+#             dict(
+#                 x=[i for i in range(0, len(traces])),
+#                 y=[i[s ] for i in traces],
+#                 name=s,
+#                 mode='lines+markers',
+#                 type='scatter',
+#                 marker={
+#                     'color': color_map[s]
+#                 },
+#                 showlegend=False
+#             ) for t in anomaly_trace['traces']
+#         ],
+#         'layout': {
+#             'title': 'View of sensor specific trace',
+#             'font': {
+#                 'size': 8
+#             }
+#         },
+
+
+
+@app.callback(
+    Output('anomaly-dropdown', 'options'),
+    [Input('person-dropdown', 'value'), Input('refresh-historic-data', 'n_clicks')]
+)
+def load_anomaly_dropdown(patient_id, n_clicks):
+    anomalies = historic_data_service.get_anomalies_for_patient(patient_id)
+    options = [{'label': a.anomaly_start + ' - ' + a.anomaly_end, 'value': json.dumps(a.__dict__)} for a in anomalies]
+    print(options)
+    return options
 
 
 @app.callback(
