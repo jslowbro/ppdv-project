@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -47,6 +49,7 @@ app.layout = html.Div(children=[
     # Hidden div inside the app that stores the intermediate value
     html.Div(id='trace-state', style={'display': 'none'}),
     html.Div(id='person-state', style={'display': 'none'}),
+    html.Div(id='historic-readings-state', style={'display': 'none'}),
     ######
     # INTERVALS
     dcc.Interval(
@@ -125,8 +128,8 @@ app.layout = html.Div(children=[
         min=0,
         max=3600,
         step=1,
-        marks=[{i: i} for i in range(0, 3600, 50)],
-        value=[0, 3600]
+        value=[0, 3600],
+        allowCross=False
     ),
 
 ])
@@ -171,6 +174,25 @@ def save_reading_to_state(n_intervals, person_id):
 
 
 @app.callback(
+    Output('historic-readings-state', 'children'),
+    [Input('refresh-historic-data', 'n_clicks'), Input('person-dropdown', 'value')]
+)
+def save_historic_trace_to_state(n_clicks, patient_id):
+    traces = list(map(lambda t: t.__dict__, historic_data_service.get_traces(patient_id)))
+    traces_json = json.dumps(traces)
+    return traces_json
+
+
+@app.callback(
+    Output('historic-data-slider', 'max'),
+    Input('historic-readings-state', 'children')
+)
+def update_max_range(historic_readings_state):
+    max_range = len(list(json.loads(historic_readings_state)))
+    return max_range
+
+
+@app.callback(
     Output('person-state', 'children'),
     Input('person-dropdown', 'value')
 )
@@ -197,21 +219,25 @@ def get_person_from_state(reading_json):
 
 @app.callback(
     Output('historic-data-graph', 'figure'),
-    [Input('person-dropdown', 'value'),
-     Input('sensor-checklist', 'value'),
-     Input('historic-data-interval', 'n_intervals')]
+    [Input('sensor-checklist', 'value'),
+     Input('historic-data-slider', 'value'),
+     Input('historic-readings-state', 'children')]
 )
-def display_historic_readings_graph(patient_id, sensor_options, n_intervals):
-    traces = list(map(lambda t: t.__dict__, historic_data_service.get_traces(patient_id)))
+def display_historic_readings_graph(sensor_options, slider_range, historic_readings_state):
+    traces = list(json.loads(historic_readings_state))[slider_range[0]:slider_range[1]]
     print(len(traces))
     return {
         'data': [
             dict(
-                x=[i for i in range(0, len(traces))],
+                x=[i for i in range(slider_range[0], slider_range[1])],
                 y=[i[s] for i in traces],
                 name=s,
                 mode='lines+markers',
-                type='scatter'
+                type='scatter',
+                marker={
+                    'color': color_map[s]
+                },
+                showlegend=False
             ) for s in sensor_options
         ],
         'layout': {
