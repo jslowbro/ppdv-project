@@ -233,7 +233,7 @@ def update_anomaly_graph(anomaly_trace_json, sensor_options):
 )
 def load_anomaly_dropdown(patient_id, n_clicks):
     anomalies = historic_data_service.get_anomalies_for_patient(patient_id)
-    options = [{'label': a.anomaly_start[0:19] + ' - ' + a.anomaly_end[0:19], 'value': json.dumps(a.__dict__)} for a in
+    options = [{'label': a.anomaly_start[10:19] + ' - ' + a.anomaly_end[10:19], 'value': json.dumps(a.__dict__)} for a in
                anomalies]
     return options
 
