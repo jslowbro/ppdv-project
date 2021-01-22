@@ -19,7 +19,7 @@ from dash.dependencies import Input, Output
 from domain import models_marshaller
 from services import historic_data_collector, historic_data_service, tesla_service, utils
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', 'assets/style.css']
 
 # static values
 client_id = 1
@@ -157,7 +157,7 @@ app.layout = html.Div(children=[
                 'textAlign': 'center'
             }),
     dcc.Graph(id='anomaly-viewer', figure={
-        'data': {},
+        'data': [],
         'layout': {
             'title': 'Trace in which an anomaly has been detected',
             'xaxis': {'title': 'Timeline of data points'},
@@ -189,7 +189,7 @@ app.layout = html.Div(children=[
                 options=[]
             ),
         ]),
-    ], style={'textAlign': 'center', 'margin': '10px'}),
+    ], style={'textAlign': 'center', 'margin': '20px'}),
 ])
 
 
@@ -365,4 +365,4 @@ def display_range_slider_value(slider_range):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
