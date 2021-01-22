@@ -7,7 +7,7 @@ from domain import models_marshaller
 url = "http://tesla.iem.pw.edu.pl:9080/v2/monitor/"
 
 
-# Call tesla api and marshall the message into reading
+# Call tesla api and marshall the message into Reading
 def get_patient_reading(reading_id: int) -> Reading:
     response = requests.get(url + str(reading_id))
     reading = models_marshaller.unmarshal_reading(response.json())

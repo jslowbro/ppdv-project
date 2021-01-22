@@ -9,10 +9,12 @@ from domain import models_marshaller
 db = TinyDB('db/historic-readings.json', ensure_ascii=False)
 
 
+# save TraceModel to database
 def save_trace(trace: TraceModel):
     return db.table(str(trace.patient_id)).insert(trace.__dict__)
 
 
+# read Traces by Trace Id
 def get_traces(patient_id: int) -> [TraceModel]:
     q = Query()
     ret = db.table(str(patient_id)).search((q.patient_id == patient_id))

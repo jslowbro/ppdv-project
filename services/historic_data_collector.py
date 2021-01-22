@@ -16,6 +16,7 @@ def start_collecting_historic_data():
     t1.start()
 
 
+# Method used for iterating through patients and stoping thread for a second
 def import_data_from_tesla():
     while True:
         time.sleep(1)

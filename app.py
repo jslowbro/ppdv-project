@@ -17,7 +17,7 @@ from dash.dependencies import Input, Output
 # It also handles user interactions like user checking a box or choosing an option from a dropdown menu
 
 from domain import models_marshaller
-from services import historic_data_collector, historic_data_service, tesla_service, utils
+from services import historic_data_collector, historic_data_service, utils
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css', 'assets/style.css']
 
@@ -233,7 +233,8 @@ def update_anomaly_graph(anomaly_trace_json, sensor_options):
 )
 def load_anomaly_dropdown(patient_id, n_clicks):
     anomalies = historic_data_service.get_anomalies_for_patient(patient_id)
-    options = [{'label': a.anomaly_start[10:19] + ' - ' + a.anomaly_end[10:19], 'value': json.dumps(a.__dict__)} for a in
+    options = [{'label': a.anomaly_start[10:19] + ' - ' + a.anomaly_end[10:19], 'value': json.dumps(a.__dict__)} for a
+               in
                anomalies]
     return options
 
@@ -273,7 +274,7 @@ def update_graph_live(reading_json):
     [Input('interval-component', 'n_intervals'), Input('person-dropdown', 'value')]
 )
 def save_reading_to_state(n_intervals, person_id):
-    reading = tesla_service.get_patient_reading(person_id)
+    reading = historic_data_service.get_reading(person_id)
     reading_json = reading.toJSON()
     return reading_json
 
@@ -304,7 +305,7 @@ def update_slider(historic_readings_state):
     Input('person-dropdown', 'value')
 )
 def save_person_to_state(person_id):
-    reading = tesla_service.get_patient_reading(person_id)
+    reading = historic_data_service.get_reading(person_id)
     reading_json = reading.toJSON()
     return reading_json
 

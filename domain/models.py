@@ -5,6 +5,8 @@ from typing import List
 
 # This file defines structure of the sensor data
 # Response from http://tesla.iem.pw.edu.pl:9080/v2/monitor/1 is a blueprint for how the data looks
+# Other classes represent objects we save to database
+
 @dataclass
 class Sensor:
     anomaly: bool
