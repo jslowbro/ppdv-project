@@ -65,7 +65,7 @@ app.layout = html.Div(children=[
             }),
     html.Div([
         html.Div(children=[
-            html.Label('Choose a person'),
+            html.Label('Choose a patient'),
             dcc.Dropdown(
                 id='person-dropdown',
                 options=[

@@ -2,15 +2,6 @@ from dao import anomaly_dao, trace_dao
 from domain.models import TraceModel, AnomalyTrace
 
 
-# This service is made primarily for accessing historical data to show to the viewer
-
-#
-# should register and store in some storage (file on a disk, sqlite database - your
-# choice) the history of walking for at least 10 minutes backward to current
-# time to allow review of historical values;
-
-# RUN ONLY ONCE ON STARTUP
-
 def get_traces(patient_id: int) -> [TraceModel]:
     return trace_dao.get_traces(patient_id)
 
